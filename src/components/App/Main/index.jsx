@@ -5,9 +5,11 @@ import React from 'react';
 import { compose } from 'recompose';
 import PropTypes from 'prop-types';
 import withFirebaseAuth from 'react-with-firebase-auth';
-import * as firebase from 'firebase/app';
+import firebase from 'firebase';
+import { FirestoreProvider } from "@react-firebase/firestore";
 import 'firebase/auth';
 import firebaseConfig from '../../../firebaseConfig';
+import Timer from '../Timer';
 
 const firebaseApp = firebase.initializeApp(firebaseConfig);
 
@@ -24,17 +26,23 @@ function Main(props) {
   } = props;
 
   return (
-    <div>
-      <h2>Welcome to Novuss Ref!</h2>
-      {user
-        ? <div>Hello, {user.displayName}!</div>
-        : <div>Please sign in.</div>
-      }
-      {user
-        ? <button onClick={signOut}>Sign out</button>
-        : <button onClick={signInWithGoogle}>Sign in</button>
-      }
-    </div>
+    <FirestoreProvider {...firebaseConfig} firebase={firebase}>
+      <div>
+        <h2>This is Novuss Ref</h2>
+        {user ?
+          <div>
+            Hello, {user.displayName}!
+            <Timer user={user}/>
+          </div>
+          :
+          <div>Please sign in.</div>
+        }
+        {user
+          ? <button onClick={signOut}>Sign out</button>
+          : <button onClick={signInWithGoogle}>Sign in</button>
+        }
+      </div>
+    </FirestoreProvider>
   );
 }
 
