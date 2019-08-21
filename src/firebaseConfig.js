@@ -3,13 +3,13 @@
  */
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAVpD7g-sVDBMpGzvpR1Hw0vRduDespz4A",
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
   authDomain: "novuss-ref.firebaseapp.com",
   databaseURL: "https://novuss-ref.firebaseio.com",
   projectId: "novuss-ref",
   storageBucket: "",
-  messagingSenderId: "393730386435",
-  appId: "1:393730386435:web:ae1ad8194377da8f"
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
 };
 
 export default firebaseConfig;
