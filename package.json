@@ -5,7 +5,10 @@
   "dependencies": {
     "@react-firebase/auth": "^0.2.9",
     "@react-firebase/firestore": "^0.5.4",
+    "classnames": "^2.2.6",
     "firebase": "^6.4.0",
+    "primeicons": "^2.0.0",
+    "primereact": "^3.1.8",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
     "react-router-dom": "^5.0.1",
