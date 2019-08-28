@@ -61,4 +61,6 @@ app.post('/api/cancel', (req, res) => {
 
 });
 
+app.use('/', express.static(path.join(__dirname, 'public')));
+
 app.listen(3001, () => console.log('Listening on localhost:3001'));
