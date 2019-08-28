@@ -4,7 +4,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const firebase = require("firebase/app");
-const path = require('path');
 require("firebase/firestore");
 
 const firebaseConfig = {
@@ -61,11 +60,9 @@ app.post('/api/shot', (req, res, next) => {
 app.post('/api/cancel', (req, res) => {
 
 });
-// All remaining requests return the React app, so it can handle routing.
-app.get('*', (request, response) => {
-  console.log('returning *');
-  response.sendFile(path.resolve(__dirname, '../build', 'index.html'));
-});
+
+app.use('/', express.static(__dirname + 'public'));
+
 
 const PORT = process.env.PORT || 3001;
 
