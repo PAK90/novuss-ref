@@ -48,8 +48,7 @@ function PlayerSelector(props) {
                   });
                 };
                 const handleStart = () => {
-                  // Start a new game object
-                  // TODO: make sure this can only happen if there's not already a game
+                  // // Start a new game object
                   const currentTime = new Date();
                   runMutation({
                     startTime: currentTime.getTime(),
@@ -63,7 +62,7 @@ function PlayerSelector(props) {
                 return (
                   <Button
                     onClick={refUser.value ? handleStart : handleRegister}
-                    label={refUser.value ? 'Start Game' : 'Register as Novuss Player'}
+                    label={refUser.value ? 'Game Ready' : 'Register as Novuss Player'}
                   />
                 );
               }}

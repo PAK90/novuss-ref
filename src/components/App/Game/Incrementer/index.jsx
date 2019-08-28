@@ -12,39 +12,41 @@ function Incrementer({ liveGameIndex, handleChange }) {
   return (
     <div>
       Adjust the scores
-      <FirestoreMutation type="update" path={`/games/${liveGameIndex}`}>
-        {({ runMutation }) => {
-          return (
-            <div style={{ display: 'flex' }}>
-              <Button
-                style={{ margin: '5px', flex: 1, height: '100px', background: '#e84343' }}
-                label="-1"
-                onClick={() => handleChange(runMutation, -1)}
-              />
-              <Button
-                style={{ margin: '5px', flex: 1, height: '100px', background: '#f2bb61' }}
-                label="0"
-                onClick={() => handleChange(runMutation, 0)}
-              />
-              <Button
-                style={{ margin: '5px', flex: 1, height: '100px', background: '#88cd88' }}
-                label="+1"
-                onClick={() => handleChange(runMutation, 1)}
-              />
-              <Button
-                style={{ margin: '5px', flex: 1, height: '100px', background: '#59bb59' }}
-                label="+2"
-                onClick={() => handleChange(runMutation, 2)}
-              />
-              <Button
-                style={{ margin: '5px', flex: 1, height: '100px', background: '#31a231' }}
-                label="+3"
-                onClick={() => handleChange(runMutation, 3)}
-              />
-            </div>
-          );
-        }}
-      </FirestoreMutation>
+      <div>
+        <div style={{ display: 'flex' }}>
+          <Button
+            style={{ margin: '5px', flex: 1, height: '100px', background: '#e84343' }}
+            label="-1"
+            onClick={() => handleChange(-1)}
+          />
+          <Button
+            style={{ margin: '5px', flex: 1, height: '100px', background: '#f2bb61' }}
+            label="0"
+            onClick={() => handleChange(0)}
+          />
+          <Button
+            style={{ margin: '5px', flex: 1, height: '100px', background: '#88cd88' }}
+            label="+1"
+            onClick={() => handleChange(1)}
+          />
+          <Button
+            style={{ margin: '5px', flex: 1, height: '100px', background: '#59bb59' }}
+            label="+2"
+            onClick={() => handleChange(2)}
+          />
+          <Button
+            style={{ margin: '5px', flex: 1, height: '100px', background: '#31a231' }}
+            label="+3"
+            onClick={() => handleChange(3)}
+          />
+        </div>
+        <Button
+          label="Cancel game"
+          onClick={() => {
+
+          }}
+        />
+      </div>
     </div>
   );
 }
@@ -53,15 +55,14 @@ Incrementer.propTypes = {};
 
 const enhance = compose(
   withHandlers({
-    handleChange: ({ shots }) => (runMutationFn, change) => {
-      runMutationFn({
-        shots: [
-          ...shots,
-          {
-            time: Date.now(),
-            change,
-          },
-        ],
+    handleChange: ({ liveGameIndex }) => (change) => {
+      fetch('/api/shot', {
+        method: 'post',
+        body: JSON.stringify({
+          gameId: liveGameIndex,
+          change,
+        }),
+        headers: { "Content-Type": "application/json" }
       })
     }
   })

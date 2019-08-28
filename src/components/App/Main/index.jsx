@@ -4,12 +4,9 @@
 import React from 'react';
 import { compose } from 'recompose';
 import PropTypes from 'prop-types';
-import withFirebaseAuth from 'react-with-firebase-auth';
-import firebase from 'firebase';
 import { FirestoreCollection, FirestoreProvider } from '@react-firebase/firestore';
 import 'firebase/auth';
-import firebaseConfig from '../../../firebaseConfig';
-import Timer from '../PlayerSelector';
+import PlayerSelector from '../PlayerSelector';
 
 function Main(props) {
   const {
@@ -27,7 +24,7 @@ function Main(props) {
           Hello, {user.displayName}!
           <FirestoreCollection path="/users/" >
             {d => {
-              return d.value ? <Timer user={user} users={d.value}/> : 'Loading players...'
+              return d.value ? <PlayerSelector user={user} users={d.value}/> : 'Loading players...'
             }}
           </FirestoreCollection>
         </div>

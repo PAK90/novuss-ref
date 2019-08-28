@@ -7,6 +7,7 @@ import { compose } from 'recompose';
 import { FirestoreCollection, FirestoreDocument } from '@react-firebase/firestore';
 import { FirebaseAuthConsumer } from '@react-firebase/auth';
 import Incrementer from './Incrementer';
+import { Button } from 'primereact/button';
 
 class Game extends Component {
   constructor(props) {
@@ -15,13 +16,18 @@ class Game extends Component {
     this.state = {
       currentTime: Date.now(),
       active: false,
-    }
+    };
+    this.serverTimeOffset = 0;
+
+    fetch('/api/servertime')
+      .then(response => response.json())
+      .then(json => this.serverTimeOffset = Date.now() - json.timestamp)
   }
 
   startTimer() {
     if (!this.state.active) {
       this.timer = setInterval(() => this.setState({
-        currentTime: Date.now(),
+        currentTime: Date.now() + (this.serverTimeOffset),
         active: true,
       }), 1000);
     }
@@ -43,7 +49,9 @@ class Game extends Component {
           if (games.isLoading) {
             return 'Loading games...';
           }
-          const { currentTime, active } = this.state;
+          const { currentTime } = this.state;
+          // TODO: this can probably mess up when you find more than one game, if one ended early.
+          // To be fair, in reality this will rarely be a problem.
           let liveGameIx = games.value.findIndex(g => g.startTime < currentTime && g.endTime > currentTime);
           if (liveGameIx !== -1) {
             const liveGame = games.value[liveGameIx];
@@ -99,9 +107,25 @@ class Game extends Component {
 
           this.stopTimer();
           // Else show a list of games or something
-          return (<div>
-            No game is currently live. Maybe start one!
-          </div>);
+          return (
+            <div>
+              <p>No game is currently live.</p>
+              <Button
+                onClick={() => {
+                  fetch('/api/start', {
+                    method: 'post',
+                    body: JSON.stringify({
+                      refId: this.props.user.uid,
+                      playerId: this.props.user.uid, // FIXME, this is wrong...
+                    }),
+                    headers: { "Content-Type": "application/json" }
+                  })
+                    .then(response => response.json())
+                    .then(() => this.startTimer());
+                }}
+                label="Start a game!"/>
+            </div>
+          );
         }}
       </FirestoreCollection>
     );
