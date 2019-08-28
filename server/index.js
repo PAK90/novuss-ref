@@ -29,7 +29,7 @@ app.get('/api/servertime', (req, res) => {
   res.send(JSON.stringify({ timestamp: Date.now() }));
 });
 
-app.post('/api/start', (req, res) => {
+app.post('/api/start', (req, res, next) => {
   // Starts a game, returns the server's initial timestamp.
   const { playerId, refId } = req.body;
   res.setHeader('Content-Type', 'application/json');
@@ -40,10 +40,11 @@ app.post('/api/start', (req, res) => {
       shots: [],
       ref: refId,
       player: playerId,
-    })//.then(() => res.send(JSON.stringify({ timestamp: Date.now() })));
+    });
+  next();
 });
 
-app.post('/api/shot', (req, res) => {
+app.post('/api/shot', (req, res, next) => {
   const { change, gameId } = req.body;
   console.log(req.body);
   res.setHeader('Content-Type', 'application/json');
@@ -52,7 +53,8 @@ app.post('/api/shot', (req, res) => {
       timestamp: Date.now(),
       change,
     })
-  })
+  });
+  next();
 });
 
 app.post('/api/cancel', (req, res) => {

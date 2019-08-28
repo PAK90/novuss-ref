@@ -49,7 +49,7 @@ class Game extends Component {
           if (games.isLoading) {
             return 'Loading games...';
           }
-          const { currentTime } = this.state;
+          const currentTime = Date.now() + this.serverTimeOffset;
           // TODO: this can probably mess up when you find more than one game, if one ended early.
           // To be fair, in reality this will rarely be a problem.
           let liveGameIx = games.value.findIndex(g => g.startTime < currentTime && g.endTime > currentTime);
@@ -110,20 +110,6 @@ class Game extends Component {
           return (
             <div>
               <p>No game is currently live.</p>
-              <Button
-                onClick={() => {
-                  fetch('/api/start', {
-                    method: 'post',
-                    body: JSON.stringify({
-                      refId: this.props.user.uid,
-                      playerId: this.props.user.uid, // FIXME, this is wrong...
-                    }),
-                    headers: { "Content-Type": "application/json" }
-                  })
-                    .then(response => response.json())
-                    .then(() => this.startTimer());
-                }}
-                label="Start a game!"/>
             </div>
           );
         }}

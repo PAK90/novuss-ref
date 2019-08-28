@@ -49,20 +49,28 @@ function PlayerSelector(props) {
                 };
                 const handleStart = () => {
                   // // Start a new game object
-                  const currentTime = new Date();
-                  runMutation({
-                    startTime: currentTime.getTime(),
-                    endTime: currentTime.setMinutes(currentTime.getMinutes() + 5),
-                    shots: [],
-                    ref: user.uid,
-                    player: livePlayer,
+                  // const currentTime = new Date();
+                  // runMutation({
+                  //   startTime: currentTime.getTime(),
+                  //   endTime: currentTime.setMinutes(currentTime.getMinutes() + 5),
+                  //   shots: [],
+                  //   ref: user.uid,
+                  //   player: livePlayer,
+                  // });
+                  fetch('/api/start', {
+                    method: 'post',
+                    body: JSON.stringify({
+                      refId: user.uid,
+                      playerId: livePlayer,
+                    }),
+                    headers: { "Content-Type": "application/json" }
                   });
                   history.push('/game');
                 };
                 return (
                   <Button
                     onClick={refUser.value ? handleStart : handleRegister}
-                    label={refUser.value ? 'Game Ready' : 'Register as Novuss Player'}
+                    label={refUser.value ? 'Start Game' : 'Register as Novuss Player'}
                   />
                 );
               }}
