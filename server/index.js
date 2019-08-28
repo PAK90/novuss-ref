@@ -66,4 +66,6 @@ app.get('*', (request, response) => {
   response.sendFile(path.resolve(__dirname, '../build', 'index.html'));
 });
 
-app.listen(3001, () => console.log('Listening on localhost:3001'));
+const PORT = process.env.PORT || 3001;
+
+app.listen(PORT, () => console.log(`Listening on localhost:${PORT}`));
