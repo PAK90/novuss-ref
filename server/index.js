@@ -61,7 +61,7 @@ app.post('/api/cancel', (req, res) => {
 
 });
 
-app.use('/', express.static(__dirname + 'public'));
+app.get('/', express.static(__dirname + 'public'));
 
 
 const PORT = process.env.PORT || 3001;
