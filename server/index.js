@@ -60,7 +60,10 @@ app.post('/api/shot', (req, res, next) => {
 app.post('/api/cancel', (req, res) => {
 
 });
-
-app.use('/', express.static(__dirname + 'public'));
+// All remaining requests return the React app, so it can handle routing.
+app.get('*', (request, response) => {
+  console.log('returning *');
+  response.sendFile(path.resolve(__dirname, '../build', 'index.html'));
+});
 
 app.listen(3001, () => console.log('Listening on localhost:3001'));
