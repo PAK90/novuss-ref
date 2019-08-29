@@ -63,11 +63,12 @@ app.post('/api/cancel', (req, res) => {
 });
 
 // Express serve up index.html file if it doesn't recognize route
-app.get('*', (request, response) => {
-  const path = require('path');
-  console.log('returning *');
-  response.sendFile(path.resolve(__dirname, '../build', 'index.html'));
-});
+const path = require('path');
+app.use(express.static(path.resolve(__dirname, '../build')));
+// app.get('*', (request, response) => {
+//   console.log('returning *');
+//   response.sendFile(path.resolve(__dirname, '../build', 'index.html'));
+// });
 
 const PORT = process.env.PORT || 3001;
 
