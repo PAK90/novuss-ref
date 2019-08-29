@@ -62,14 +62,13 @@ app.post('/api/cancel', (req, res) => {
 
 });
 
-if (process.env.NODE_ENV === 'production') {
-  // Express serve up index.html file if it doesn't recognize route
+// Express serve up index.html file if it doesn't recognize route
+app.get('*', (request, response) => {
   const path = require('path');
-  app.get('/', (req, res) => {
-    console.log('returning /...');
-    res.sendFile(path.resolve(__dirname, '../build', 'index.html'));
-  });
-}
+  console.log('returning *');
+  response.sendFile(path.resolve(__dirname, '../build', 'index.html'));
+});
+
 const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => console.log(`Listening on localhost:${PORT}`));
