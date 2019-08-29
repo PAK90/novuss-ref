@@ -66,7 +66,7 @@ app.post('/api/cancel', (req, res) => {
 app.get('*', (request, response) => {
   const path = require('path');
   console.log('returning *');
-  response.sendFile(path.resolve(__dirname, '../build', 'index.html'));
+  response.sendFile(path.resolve(__dirname, '../public', 'index.html'));
 });
 
 const PORT = process.env.PORT || 3001;
