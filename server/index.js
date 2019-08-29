@@ -67,7 +67,7 @@ if (process.env.NODE_ENV === 'production') {
   const path = require('path');
   app.get('/', (req, res) => {
     console.log('returning /...');
-    res.sendFile(path.resolve(__dirname, '../build', 'index.html'));
+    res.sendFile(path.resolve(__dirname, '../build'));
   });
 }
 const PORT = process.env.PORT || 3001;
