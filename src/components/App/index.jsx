@@ -11,6 +11,7 @@ import firebaseConfig from '../../firebaseConfig';
 import firebase from 'firebase';
 import { compose } from 'recompose';
 import withFirebaseAuth from 'react-with-firebase-auth';
+import Header from './Header';
 
 const firebaseApp = firebase.initializeApp(firebaseConfig);
 
@@ -24,6 +25,7 @@ function App({ ...topProps }) {
   return (
     <FirestoreProvider {...firebaseConfig} firebase={firebase}>
       <Router>
+        <Header />
         <Route path="/" exact render={(props) => <Main {...props} {...topProps} />} />
         <Route path="/game/" render={(props) => <Game {...props} {...topProps} />} />
       </Router>

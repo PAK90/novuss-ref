@@ -7,7 +7,7 @@ import { compose, withHandlers } from 'recompose';
 import { FirestoreMutation } from '@react-firebase/firestore';
 import { Button } from 'primereact/button';
 
-function Incrementer({ liveGameIndex, handleChange }) {
+function Incrementer({ handleChange, handleCancel }) {
 
   return (
     <div>
@@ -42,9 +42,7 @@ function Incrementer({ liveGameIndex, handleChange }) {
         </div>
         <Button
           label="Cancel game"
-          onClick={() => {
-
-          }}
+          onClick={handleCancel}
         />
       </div>
     </div>
@@ -55,12 +53,22 @@ Incrementer.propTypes = {};
 
 const enhance = compose(
   withHandlers({
-    handleChange: ({ liveGameIndex }) => (change) => {
+    handleChange: ({ liveGameIndex, score }) => (change) => {
       fetch('/api/shot', {
         method: 'post',
         body: JSON.stringify({
           gameId: liveGameIndex,
           change,
+        }),
+        headers: { "Content-Type": "application/json" }
+      })
+    },
+
+    handleCancel: ({ liveGameIndex }) => () => {
+      fetch('/api/cancel', {
+        method: 'post',
+        body: JSON.stringify({
+          gameId: liveGameIndex,
         }),
         headers: { "Content-Type": "application/json" }
       })

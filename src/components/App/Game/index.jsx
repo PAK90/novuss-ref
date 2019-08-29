@@ -52,7 +52,7 @@ class Game extends Component {
           const currentTime = Date.now() + this.serverTimeOffset;
           // TODO: this can probably mess up when you find more than one game, if one ended early.
           // To be fair, in reality this will rarely be a problem.
-          let liveGameIx = games.value.findIndex(g => g.startTime < currentTime && g.endTime > currentTime);
+          let liveGameIx = games.value.findIndex(g => g.active);
           if (liveGameIx !== -1) {
             const liveGame = games.value[liveGameIx];
             // Game is live!

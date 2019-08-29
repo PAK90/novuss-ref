@@ -46,29 +46,38 @@ app.post('/api/start', (req, res, next) => {
 });
 
 app.post('/api/shot', (req, res, next) => {
-  const { change, gameId, score } = req.body;
+  const { change, gameId } = req.body;
   console.log(req.body);
   res.setHeader('Content-Type', 'application/json');
-  db.collection('games').doc(gameId).update({
+  const gameRef = db.collection('games').doc(gameId);
+
+  gameRef.update({
     'shots': firebase.firestore.FieldValue.arrayUnion({
       timestamp: Date.now(),
       change,
+    })
+  }).then(() => {
+    gameRef.get().then(doc => {
+      const score = doc.data().shots.reduce((totalScore, shot) => (totalScore += shot.change), 0);
+      // If player has sunk all the things, end the game!
+      if (score >= 32) {
+        gameRef.update({
+          active: false,
+        });
+      }
     })
   });
   next();
 });
 
 app.post('/api/cancel', (req, res) => {
-
+  const { gameId } = req.body;
+  db.collection('games').doc(gameId).delete();
 });
 
 // Express serve up index.html file if it doesn't recognize route
 const path = require('path');
 app.use(express.static(path.resolve(__dirname, '../build')));
-// app.get('*', (request, response) => {
-//   console.log('returning *');
-//   response.sendFile(path.resolve(__dirname, '../build', 'index.html'));
-// });
 
 const PORT = process.env.PORT || 3001;
 

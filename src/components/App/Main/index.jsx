@@ -17,7 +17,6 @@ function Main(props) {
 
   return (
     <div>
-      <h2>This is Novuss Ref</h2>
       {user ?
         <div>
           <img src={user.photoURL} height={50} style={{ borderRadius: '50%' }} />
