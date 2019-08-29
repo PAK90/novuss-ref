@@ -40,12 +40,13 @@ app.post('/api/start', (req, res, next) => {
       shots: [],
       ref: refId,
       player: playerId,
+      active: true,
     });
   next();
 });
 
 app.post('/api/shot', (req, res, next) => {
-  const { change, gameId } = req.body;
+  const { change, gameId, score } = req.body;
   console.log(req.body);
   res.setHeader('Content-Type', 'application/json');
   db.collection('games').doc(gameId).update({
@@ -64,7 +65,8 @@ app.post('/api/cancel', (req, res) => {
 if (process.env.NODE_ENV === 'production') {
   // Express serve up index.html file if it doesn't recognize route
   const path = require('path');
-  app.get('*', (req, res) => {
+  app.get('/', (req, res) => {
+    console.log('returning /...');
     res.sendFile(path.resolve(__dirname, '../build', 'index.html'));
   });
 }
