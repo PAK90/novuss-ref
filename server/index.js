@@ -55,6 +55,7 @@ app.post('/api/start', (req, res, next) => {
   }
   timerInterval = setInterval(() => {
     const timeLeft = endTime - Date.now();
+    console.log('emitting time left: ', timeLeft);
     io.sockets.emit('timerOut', timeLeft);
   }, 1000);
 
@@ -68,6 +69,7 @@ app.post('/api/start', (req, res, next) => {
   }).then(gameRef => (
     // Set up a setTimeout that sets active:false after duration.
     setTimeout(() => {
+      console.log('ending game due to time');
       gameRef.update({
         active: false,
       });
