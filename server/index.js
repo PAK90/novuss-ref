@@ -28,6 +28,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 const io = socketIo(server);
+io.set('origins', '*:*');
 let timerInterval;
 // io.on('connection', socket => {
 //   console.log('New client connected');

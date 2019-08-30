@@ -6,7 +6,6 @@ import PropTypes from 'prop-types';
 import { compose } from 'recompose';
 import socketIOClient from "socket.io-client";
 import { FirestoreCollection, FirestoreDocument } from '@react-firebase/firestore';
-import { FirebaseAuthConsumer } from '@react-firebase/auth';
 import Incrementer from './Incrementer';
 import { Button } from 'primereact/button';
 
@@ -21,7 +20,10 @@ class Game extends Component {
 
   componentDidMount() {
     const socket = socketIOClient(`http://127.0.0.1:${process.env.PORT || 3001}`);
-    socket.on('timerOut', data => this.setState({ timeLeft: data }));
+    socket.on('timerOut', data => {
+      this.setState({ timeLeft: data });
+      console.log('data');
+    });
   }
 
   render() {
