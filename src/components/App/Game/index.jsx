@@ -19,7 +19,12 @@ class Game extends Component {
   }
 
   componentDidMount() {
-    const socket = socketIOClient();
+    let server;
+    if (process.env.NODE_ENV === 'development') {
+      server = 'http://127.0.0.1:3001';
+    }
+    console.log(server);
+    const socket = socketIOClient(server);
     socket.on('timerOut', data => {
       this.setState({ timeLeft: data });
       console.log('data');
