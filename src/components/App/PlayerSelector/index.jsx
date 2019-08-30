@@ -54,7 +54,7 @@ function PlayerSelector(props) {
                     body: JSON.stringify({
                       refId: user.uid,
                       playerId: livePlayer,
-                      duration: 1,
+                      duration: 5,
                     }),
                     headers: { "Content-Type": "application/json" }
                   });
