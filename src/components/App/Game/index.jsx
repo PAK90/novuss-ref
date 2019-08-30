@@ -19,7 +19,7 @@ class Game extends Component {
   }
 
   componentDidMount() {
-    const socket = socketIOClient(`http://127.0.0.1:${process.env.PORT || 3001}`);
+    const socket = socketIOClient(`https://novuss-app-staging.herokuapp.com`);
     socket.on('timerOut', data => {
       this.setState({ timeLeft: data });
       console.log('data');
