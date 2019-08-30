@@ -4,6 +4,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'recompose';
+import socketIOClient from "socket.io-client";
 import { FirestoreCollection, FirestoreDocument } from '@react-firebase/firestore';
 import { FirebaseAuthConsumer } from '@react-firebase/auth';
 import Incrementer from './Incrementer';
@@ -14,30 +15,13 @@ class Game extends Component {
     super(props);
 
     this.state = {
-      currentTime: Date.now(),
-      active: false,
+      timeLeft: null,
     };
-    this.serverTimeOffset = 0;
-
-    fetch('/api/servertime')
-      .then(response => response.json())
-      .then(json => this.serverTimeOffset = Date.now() - json.timestamp)
   }
 
-  startTimer() {
-    if (!this.state.active) {
-      this.timer = setInterval(() => this.setState({
-        currentTime: Date.now() + (this.serverTimeOffset),
-        active: true,
-      }), 1000);
-    }
-  }
-
-  stopTimer () {
-    if (this.state.active) {
-      clearInterval(this.timer);
-      this.setState({ active: false });
-    }
+  componentDidMount() {
+    const socket = socketIOClient(`http://127.0.0.1:${process.env.PORT || 3001}`);
+    socket.on('timerOut', data => this.setState({ timeLeft: data }));
   }
 
   render() {
@@ -49,22 +33,15 @@ class Game extends Component {
           if (games.isLoading) {
             return 'Loading games...';
           }
-          const currentTime = Date.now() + this.serverTimeOffset;
           // TODO: this can probably mess up when you find more than one game, if one ended early.
           // To be fair, in reality this will rarely be a problem.
           let liveGameIx = games.value.findIndex(g => g.active);
           if (liveGameIx !== -1) {
             const liveGame = games.value[liveGameIx];
-            // Game is live!
-            let timeLeft = liveGame.endTime - currentTime;
-            this.startTimer();
+            let { timeLeft } = this.state;
 
             const timeString = `${Math.floor(timeLeft / 1000 / 60)}:${Math.floor(timeLeft / 1000 % 60).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false})}`
             let score = liveGame.shots.reduce((totalScore, shot) => (totalScore += shot.change), 0);
-            if (score >= 32) {
-              this.stopTimer();
-              return 'Game has finished!';
-            }
 
             const scoreContent = (
               <div>
@@ -105,7 +82,6 @@ class Game extends Component {
             )
           }
 
-          this.stopTimer();
           // Else show a list of games or something
           return (
             <div>

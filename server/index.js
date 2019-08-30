@@ -4,6 +4,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const firebase = require("firebase/app");
+const http = require("http");
+const socketIo = require("socket.io");
 require("firebase/firestore");
 
 const firebaseConfig = {
@@ -20,28 +22,58 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 const app = express();
+const server = http.createServer(app);
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.get('/api/servertime', (req, res) => {
-  res.setHeader('Content-Type', 'application/json');
-  res.send(JSON.stringify({ timestamp: Date.now() }));
-});
+const io = socketIo(server);
+let timerInterval;
+// io.on('connection', socket => {
+//   console.log('New client connected');
+//   //Here we listen on a new namespace called "incoming data"
+//   socket.on('timer in', (data) => {
+//     // Here we broadcast it out to all other sockets EXCLUDING the socket which sent us the data
+//     console.log('broadcasting');
+//     socket.broadcast.emit('timerOut', { timeLeft: data });
+//   });
+//
+//   socket.on('disconnect', () => console.log('Client disconnected'));
+// });
 
 app.post('/api/start', (req, res, next) => {
-  // Starts a game, returns the server's initial timestamp.
-  const { playerId, refId } = req.body;
+  // Starts a game, sets a timeout in X minutes that'll end it.
+  const { playerId, refId, duration } = req.body;
   res.setHeader('Content-Type', 'application/json');
   const currentTime = new Date();
+  // Add a 3 second buffer for server stuff and socket stuff.
+  let endTime = new Date().setMinutes(currentTime.getMinutes() + duration, currentTime.getSeconds() + 1);
+
+  // TODO: add a setInterval that sockets the time left to any listeners every second.
+  if (timerInterval) {
+    clearInterval(timerInterval);
+  }
+  timerInterval = setInterval(() => {
+    const timeLeft = endTime - Date.now();
+    io.sockets.emit('timerOut', timeLeft);
+  }, 1000);
+
   db.collection('games').add({
-      startTime: currentTime.getTime(),
-      endTime: currentTime.setMinutes(currentTime.getMinutes() + 5),
-      shots: [],
-      ref: refId,
-      player: playerId,
-      active: true,
-    });
+    startTime: currentTime.getTime(),
+    endTime,
+    shots: [],
+    ref: refId,
+    player: playerId,
+    active: true,
+  }).then(gameRef => (
+    // Set up a setTimeout that sets active:false after duration.
+    setTimeout(() => {
+      gameRef.update({
+        active: false,
+      });
+      clearInterval(timerInterval);
+    }, endTime - currentTime.getTime())
+  ));
   next();
 });
 
@@ -61,6 +93,7 @@ app.post('/api/shot', (req, res, next) => {
       const score = doc.data().shots.reduce((totalScore, shot) => (totalScore += shot.change), 0);
       // If player has sunk all the things, end the game!
       if (score >= 32) {
+        clearInterval(timerInterval);
         gameRef.update({
           active: false,
         });
@@ -72,6 +105,7 @@ app.post('/api/shot', (req, res, next) => {
 
 app.post('/api/cancel', (req, res) => {
   const { gameId } = req.body;
+  clearInterval(timerInterval);
   db.collection('games').doc(gameId).delete();
 });
 
@@ -81,4 +115,5 @@ app.use(express.static(path.resolve(__dirname, '../build')));
 
 const PORT = process.env.PORT || 3001;
 
-app.listen(PORT, () => console.log(`Listening on localhost:${PORT}`));
+server.listen(PORT, () => console.log(`Listening on port ${PORT}`));
+// app.listen(PORT, () => console.log(`Listening on localhost:${PORT}`));

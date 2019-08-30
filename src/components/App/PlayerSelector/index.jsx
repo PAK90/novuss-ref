@@ -48,20 +48,13 @@ function PlayerSelector(props) {
                   });
                 };
                 const handleStart = () => {
-                  // // Start a new game object
-                  // const currentTime = new Date();
-                  // runMutation({
-                  //   startTime: currentTime.getTime(),
-                  //   endTime: currentTime.setMinutes(currentTime.getMinutes() + 5),
-                  //   shots: [],
-                  //   ref: user.uid,
-                  //   player: livePlayer,
-                  // });
+                  // Start a new game object
                   fetch('/api/start', {
                     method: 'post',
                     body: JSON.stringify({
                       refId: user.uid,
                       playerId: livePlayer,
+                      duration: 1,
                     }),
                     headers: { "Content-Type": "application/json" }
                   });
