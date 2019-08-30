@@ -113,7 +113,7 @@ app.post('/api/cancel', (req, res) => {
 });
 
 const path = require('path');
-app.use(express.static(path.resolve(__dirname, '../build/static')));
+app.use(express.static(path.resolve(__dirname, '../build')));
 
 // Express serve up index.html file if it doesn't recognize route
 // app.get('*', (req, res) => {
