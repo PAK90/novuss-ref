@@ -117,7 +117,7 @@ app.use(express.static(path.resolve(__dirname, '../build/static')));
 
 // Express serve up index.html file if it doesn't recognize route
 app.get('*', (req, res) => {
-  res.sendFile(path.resolve(__dirname + '../build', 'index.html'));
+  res.sendFile(path.resolve(__dirname, '../build', 'index.html'));
 });
 
 const PORT = process.env.PORT || 3001;
