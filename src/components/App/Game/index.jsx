@@ -8,6 +8,7 @@ import socketIOClient from "socket.io-client";
 import { FirestoreCollection, FirestoreDocument } from '@react-firebase/firestore';
 import Incrementer from './Incrementer';
 import { Button } from 'primereact/button';
+import GameDisplay from './GameDisplay';
 
 class Game extends Component {
   constructor(props) {
@@ -23,7 +24,6 @@ class Game extends Component {
     if (process.env.NODE_ENV === 'development') {
       server = 'http://127.0.0.1:3001';
     }
-    console.log(server);
     const socket = socketIOClient(server);
     socket.on('timerOut', data => {
       this.setState({ timeLeft: data });
@@ -32,8 +32,6 @@ class Game extends Component {
   }
 
   render() {
-    if (!this.props.user) return 'Please sign in!';
-
     return (
       <FirestoreCollection path="/games/">
         {games => {
@@ -44,57 +42,47 @@ class Game extends Component {
           // To be fair, in reality this will rarely be a problem.
           let liveGameIx = games.value.findIndex(g => g.active);
           if (liveGameIx !== -1) {
+
             const liveGame = games.value[liveGameIx];
-            let { timeLeft } = this.state;
-
-            const timeString = `${Math.floor(timeLeft / 1000 / 60)}:${Math.floor(timeLeft / 1000 % 60).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false})}`
-            let score = liveGame.shots.reduce((totalScore, shot) => (totalScore += shot.change), 0);
-
-            const scoreContent = (
-              <div>
-                <div>{timeString}</div>
-                <div>{`Score: ${score}`}</div>
-                <div>{`Penalties: ${liveGame.shots.filter(sh => sh.change === -1).length}`}</div>
-                <div>{`Shots: ${liveGame.shots.length}`}</div>
-                <div>{`Hit rate: ${(score / liveGame.shots.length * 100).toFixed(0)}%`}</div>
-              </div>
-            );
-
+            const score = liveGame.shots.reduce((totalScore, shot) => (totalScore += shot.change), 0);
             // If you're the ref, return a different ui.
             if (liveGame.ref === this.props.user.uid) {
               return (
                 <div>
-                  {scoreContent}
+                  {score}
                   <Incrementer liveGameIndex={games.ids[liveGameIx]} shots={liveGame.shots} score={score} />
                 </div>
               );
             }
 
             return (
-              <div>
-                A game is live!
-                {scoreContent}
-                <FirestoreDocument path={`users/${liveGame.player}`}>
-                  {user => (user.value &&
-                    <div>
-                      <img src={user.value.photo} height={75} style={{ borderRadius: '50%' }} />
-                      {user.value.name}
-                    </div>
-                  )}
-                </FirestoreDocument>
-                <div style={{ fontSize: 100 }}>
-                  {timeString}
-                </div>
-              </div>
+              <GameDisplay game={liveGame} time={this.state.timeLeft} />
             )
           }
 
-          // Else show a list of games or something
+          // Else show the last game's stats and the last 5 games before that.
+          const [lastGame] = games.value.sort(v => v.endTime);
+
+          // return (
+          //   <GameDisplay game={lastGame} time={lastGame.endTime - lastGame.startTime} />
+          // )
           return (
             <div>
-              <p>No game is currently live.</p>
+              <div>
+                Last games:
+              </div>
+              {games.value.map((g, gIx) => {
+                // If score is 32, end time is not the end time, it's the time of the last shot.
+                let endTime = g.endTime;
+                const score = g.shots.reduce((totalScore, shot) => (totalScore += shot.change), 0);
+                if (score >= 32) {
+                  endTime = g.shots[g.shots.length - 1].timestamp;
+                }
+                const time = endTime - g.startTime;
+                return <GameDisplay key={games.ids[gIx]} game={g} time={time} />
+              })}
             </div>
-          );
+          )
         }}
       </FirestoreCollection>
     );

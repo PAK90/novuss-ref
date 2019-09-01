@@ -1,0 +1,15 @@
+.header {
+  background: #ccc;
+  padding: 5px;
+}
+
+.link {
+  margin: 15px;
+  padding: 5px;
+  transition: background-color 0.4s;
+  border-radius: 5px;
+
+  &:hover {
+    background: #5ab7ff;
+  }
+}

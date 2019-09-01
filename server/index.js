@@ -77,7 +77,7 @@ app.post('/api/start', (req, res, next) => {
       clearInterval(timerInterval);
     }, endTime - currentTime.getTime())
   ));
-  next();
+  res.sendStatus(200).end();
 });
 
 app.post('/api/shot', (req, res, next) => {
@@ -103,13 +103,14 @@ app.post('/api/shot', (req, res, next) => {
       }
     })
   });
-  next();
+  res.sendStatus(200).end();
 });
 
 app.post('/api/cancel', (req, res) => {
   const { gameId } = req.body;
   clearInterval(timerInterval);
   db.collection('games').doc(gameId).delete();
+  res.sendStatus(200).end();
 });
 
 const path = require('path');

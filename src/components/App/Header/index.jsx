@@ -6,13 +6,15 @@ import PropTypes from 'prop-types';
 import { compose } from 'recompose';
 import { Link } from 'react-router-dom';
 
+import styles from './headerStyles.module.scss';
+
 function Header(props) {
 
   return (
-    <div>
+    <div className={styles.header}>
       <h2>Novuss Ref!</h2>
-      <Link to="/">Home</Link>
-      <Link to="/game">Game</Link>
+      <Link className={styles.link} to="/">Home</Link>
+      <Link className={styles.link} to="/game">Game</Link>
     </div>
   )
 }
