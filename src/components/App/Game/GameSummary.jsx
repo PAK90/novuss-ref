@@ -2,46 +2,58 @@
  * Created by Arvids on 2019.08.31..
  */
 import React from 'react';
+import moment from 'moment';
 import PropTypes from 'prop-types';
+import { withRouter } from 'react-router-dom'
 import { FirestoreDocument } from '@react-firebase/firestore';
+import { compose, withHandlers } from 'recompose';
 
 import styles from './game.module.scss';
-import moment from 'moment';
+import stampToString from '../../../helpers/stampToString';
 
-export default function GameDisplay({ game, time }) {
-
+function GameSummary({ game, time, small, handleClick }) {
   const score = game.shots.reduce((totalScore, shot) => (totalScore += shot.change), 0);
-  const timeString = `${Math.floor(time / 1000 / 60)}:${Math.floor(time / 1000 % 60).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false})}`
+  const timeString = stampToString(time);
   const penalties = game.shots.filter(sh => sh.change === -1).length;
   const shots = game.shots.length;
   const hitRate = (score / shots * 100).toFixed(0);
 
-
-  const scoreContent = (
-    <div>
-      <div>{timeString}</div>
-      <div>{`Score: ${score}`}</div>
-      <div>{`Penalties: ${penalties}`}</div>
-      <div>{`Shots: ${shots}`}</div>
-      <div>{`Hit rate: ${hitRate}%`}</div>
-    </div>
-  );
-
   const playerData = (
     <FirestoreDocument path={`users/${game.player}`}>
       {user => (user.value &&
-        <div>
+        <div className={styles.playerDiv}>
           <img src={user.value.photo} height={25} style={{ borderRadius: '50%' }} />
-          {user.value.name}
+          <span className={styles.playerSpan}>{user.value.name}</span>
         </div>
       )}
     </FirestoreDocument>
   );
 
+  if (small) {
+    return (
+      <div className={styles.gameDisplayContainer} onClick={handleClick}>
+        <div className={styles.gameDisplayRow}>
+          <div className={styles.col}>
+            {moment(game.startTime).format('MMM Do h:mm')}
+          </div>
+          <div className={styles.col}>
+            {playerData}
+          </div>
+          <div className={styles.col}>
+            {timeString}
+          </div>
+          <div className={styles.col}>
+            {score}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className={styles.gameDisplayContainer}>
+    <div className={styles.gameDisplayContainer} onClick={handleClick}>
       <div className={styles.gameDisplayRow}>
-        Time: {moment(game.startTime).format('lll')} Player: {playerData}
+        {playerData}<span style={{ marginLeft: '10px' }}>({moment(game.startTime).format('MMM Do h:mm')})</span>
       </div>
       <div className={styles.gameDisplayRow}>
         <div className={styles.col}>
@@ -68,4 +80,15 @@ export default function GameDisplay({ game, time }) {
   );
 }
 
-GameDisplay.propTypes = {};
+GameSummary.propTypes = {};
+
+const enhance = compose(
+  withRouter,
+  withHandlers({
+    handleClick: ({ history, gameId }) => () => {
+      history.push(`/games/${gameId}`)
+    }
+  })
+);
+
+export default enhance(GameSummary);

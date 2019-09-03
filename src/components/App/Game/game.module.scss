@@ -2,18 +2,26 @@
   display: inline-flex;
   flex-flow: column;
   background: #eee;
-  border: 1px solid #ddd;
+  border: 1px solid #ccc;
   border-radius: 20px;
   margin: 5px;
   width: 70%;
+  box-shadow: 2px 2px 5px 0 #45454599;
+  cursor: pointer;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background: rgba(207, 248, 255, 0.7);
+  }
 }
 
 .gameDisplayRow {
   display: flex;
+  align-items: center;
   justify-content: center;
   padding: 5px;
-  border-top: 1px solid #ddd;
-  border-bottom: 1px solid #ddd;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
 
   &:first-of-type {
     border: none;
@@ -24,14 +32,26 @@
   }
 }
 
+.playerDiv {
+  display: flex;
+  white-space: nowrap;
+  align-items: center;
+}
+
+.playerSpan {
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  padding-left: 3px;
+}
+
 .col {
   flex: 1;
-  border-left: 1px solid #ddd;
-  border-right: 1px solid #ddd;
-
-  &:first-of-type {
-    border: none;
-  }
+  border-right: 1px solid #ccc;
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  overflow-x: hidden;
+  padding: 3px;
 
   &:last-of-type {
     border: none;

@@ -8,7 +8,8 @@ import socketIOClient from "socket.io-client";
 import { FirestoreCollection, FirestoreDocument } from '@react-firebase/firestore';
 import Incrementer from './Incrementer';
 import { Button } from 'primereact/button';
-import GameDisplay from './GameDisplay';
+import GameSummary from './GameSummary';
+import getEndTime from '../../../helpers/getEndTime';
 
 class Game extends Component {
   constructor(props) {
@@ -56,30 +57,24 @@ class Game extends Component {
             }
 
             return (
-              <GameDisplay game={liveGame} time={this.state.timeLeft} />
+              <GameSummary game={liveGame} time={this.state.timeLeft} />
             )
           }
 
-          // Else show the last game's stats and the last 5 games before that.
-          const [lastGame] = games.value.sort(v => v.endTime);
+          // Else show the last game's stats and the last N games before that.
+          const gameIdCombo = games.value.map((g, gIx) => ({ ...g, gameId: games.ids[gIx] }));
+          const [lastGame, ...otherGames] = gameIdCombo.sort(v => v.startTime);
 
-          // return (
-          //   <GameDisplay game={lastGame} time={lastGame.endTime - lastGame.startTime} />
-          // )
           return (
             <div>
               <div>
-                Last games:
+                <p>Last game:</p>
+                <GameSummary game={lastGame} gameId={lastGame.gameId} time={getEndTime(lastGame) - lastGame.startTime} />
               </div>
-              {games.value.map((g, gIx) => {
-                // If score is 32, end time is not the end time, it's the time of the last shot.
-                let endTime = g.endTime;
-                const score = g.shots.reduce((totalScore, shot) => (totalScore += shot.change), 0);
-                if (score >= 32) {
-                  endTime = g.shots[g.shots.length - 1].timestamp;
-                }
-                const time = endTime - g.startTime;
-                return <GameDisplay key={games.ids[gIx]} game={g} time={time} />
+              <p>Previous games:</p>
+              {otherGames.map((g, gIx) => {
+                const time = getEndTime(g) - g.startTime;
+                return <GameSummary small key={g.gameId} gameId={g.gameId} game={g} time={time} />
               })}
             </div>
           )
