@@ -140,6 +140,11 @@ function GameDetails(props) {
 
           return (
             <>
+              <p>
+                {`Scored ${score} in 
+                  ${stampToString(gameEndTime - game.value.startTime)} 
+                  with ${game.value.shots.length} shots (${(pointsPerShot * 100).toFixed(1)}% hit rate)`}
+              </p>
               <div style={{ display: 'flex' }}>
                 {vChart}
                 {pieChart}

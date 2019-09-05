@@ -7,9 +7,9 @@ import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom'
 import { FirestoreDocument } from '@react-firebase/firestore';
 import { compose, withHandlers } from 'recompose';
+import stampToString from '../../../helpers/stampToString';
 
 import styles from './game.module.scss';
-import stampToString from '../../../helpers/stampToString';
 
 function GameSummary({ game, time, small, handleClick }) {
   const score = game.shots.reduce((totalScore, shot) => (totalScore += shot.change), 0);
@@ -17,6 +17,11 @@ function GameSummary({ game, time, small, handleClick }) {
   const penalties = game.shots.filter(sh => sh.change === -1).length;
   const shots = game.shots.length;
   const hitRate = (score / shots * 100).toFixed(0);
+
+  // Can use slope to calculate per-shot 'expected value' (to hit 32 after 5 minutes)
+  // Just multiply slope by the time of any shot and subtract that from the current score, to give the diff.
+  const normalSlope = 32 / (game.endTime - game.startTime); // Usually 1 / 9375 or so.
+  // This should be expanded to the 'global average' slope as well as that player's average slope.
 
   const playerData = (
     <FirestoreDocument path={`users/${game.player}`}>
