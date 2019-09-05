@@ -29,7 +29,6 @@ class Game extends Component {
     const socket = socketIOClient(server);
     socket.on('timerOut', data => {
       this.setState({ timeLeft: data });
-      console.log('data');
     });
   }
 
@@ -58,22 +57,19 @@ class Game extends Component {
                 </div>
               );
             }
-
-            return (
-              <GameSummary game={liveGame} time={this.state.timeLeft} />
-            )
           }
 
-          // Else show the last game's stats and the last N games before that.
+          // Else show the last game's stats and the games before that.
           const gameIdCombo = games.value.map((g, gIx) => ({ ...g, gameId: games.ids[gIx] }));
-          console.log(gameIdCombo.map(g => g.startTime));
-          const [lastGame, ...otherGames] = gameIdCombo.sort(v => v.endTime);
+          const [lastGame, ...otherGames] = gameIdCombo.sort((a,b) => b.startTime - a.startTime);
+
+          const lastGameTime = liveGameIx !== -1 ? this.state.timeLeft : getEndTime(lastGame) - lastGame.startTime;
 
           return (
             <div>
               <div>
                 <p>Last game:</p>
-                <GameSummary game={lastGame} gameId={lastGame.gameId} time={getEndTime(lastGame) - lastGame.startTime} />
+                <GameSummary game={lastGame} gameId={lastGame.gameId} time={lastGameTime} />
               </div>
               <p>Previous games:</p>
               {otherGames.map((g, gIx) => {
