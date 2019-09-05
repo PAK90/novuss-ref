@@ -10,6 +10,7 @@ import Incrementer from './Incrementer';
 import { Button } from 'primereact/button';
 import GameSummary from './GameSummary';
 import getEndTime from '../../../helpers/getEndTime';
+import stampToString from '../../../helpers/stampToString';
 
 class Game extends Component {
   constructor(props) {
@@ -47,10 +48,12 @@ class Game extends Component {
             const liveGame = games.value[liveGameIx];
             const score = liveGame.shots.reduce((totalScore, shot) => (totalScore += shot.change), 0);
             // If you're the ref, return a different ui.
-            if (liveGame.ref === this.props.user.uid) {
+            if (this.props.user && liveGame.ref === this.props.user.uid) {
               return (
                 <div>
-                  {score}
+                  <p>{`Score: ${score}`}</p>
+                  <p>{`Shots: ${liveGame.shots.length}`}</p>
+                  <p>{stampToString(this.state.timeLeft)}</p>
                   <Incrementer liveGameIndex={games.ids[liveGameIx]} shots={liveGame.shots} score={score} />
                 </div>
               );
@@ -63,7 +66,8 @@ class Game extends Component {
 
           // Else show the last game's stats and the last N games before that.
           const gameIdCombo = games.value.map((g, gIx) => ({ ...g, gameId: games.ids[gIx] }));
-          const [lastGame, ...otherGames] = gameIdCombo.sort(v => v.startTime);
+          console.log(gameIdCombo.map(g => g.startTime));
+          const [lastGame, ...otherGames] = gameIdCombo.sort(v => v.endTime);
 
           return (
             <div>

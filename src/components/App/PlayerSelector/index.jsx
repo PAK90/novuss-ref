@@ -12,7 +12,7 @@ import 'primereact/resources/primereact.min.css';
 import { Dropdown } from 'primereact/dropdown';
 
 function PlayerSelector(props) {
-  const { user, users, history, livePlayer, handleChangePlayer } = props;
+  const { user, users, handleStart, livePlayer, handleChangePlayer } = props;
   return (
     <FirestoreDocument path={`/users/${user.uid}`}>
       {refUser => {
@@ -47,19 +47,6 @@ function PlayerSelector(props) {
                     photo: user.photoURL,
                   });
                 };
-                const handleStart = () => {
-                  // Start a new game object
-                  fetch('/api/start', {
-                    method: 'post',
-                    body: JSON.stringify({
-                      refId: user.uid,
-                      playerId: livePlayer,
-                      duration: 5,
-                    }),
-                    headers: { "Content-Type": "application/json" }
-                  });
-                  history.push('/game');
-                };
                 return (
                   <Button
                     onClick={refUser.value ? handleStart : handleRegister}
@@ -79,12 +66,25 @@ PlayerSelector.propTypes = {};
 
 const enhance = compose(
   withState('livePlayer', 'setLivePlayer', ({ users }) => users[0].uid),
+  withRouter,
   withHandlers({
     handleChangePlayer: ({ setLivePlayer }) => (e) => {
       setLivePlayer(e.target.value)
     },
+    handleStart: ({ history, user, livePlayer }) => {
+      // Start a new game object
+      fetch('/api/start', {
+        method: 'post',
+        body: JSON.stringify({
+          refId: user.uid,
+          playerId: livePlayer,
+          duration: 5,
+        }),
+        headers: { 'Content-Type': 'application/json' }
+      });
+      history.push('/game');
+    },
   }),
-  withRouter,
 );
 
 export default enhance(PlayerSelector);
