@@ -6,10 +6,12 @@ import PropTypes from 'prop-types';
 import { compose } from 'recompose';
 import { FirestoreDocument } from '@react-firebase/firestore';
 import { VictoryContainer, VictoryChart, VictoryAxis, VictoryArea, VictoryTheme, VictoryPie, VictoryLabel } from 'victory';
-import { XYPlot, VerticalGridLines, HorizontalGridLines, XAxis, YAxis, LineSeries } from 'react-vis';
+// import { XYPlot, VerticalGridLines, HorizontalGridLines, XAxis, YAxis, LineSeries } from 'react-vis';
 import stampToString from '../../../helpers/stampToString';
 import getEndTime from '../../../helpers/getEndTime';
+import AverageRateChart from '../../charts/AverageRateChart';
 
+import styles from './gameDetails.module.scss';
 
 function GameDetails(props) {
   const {
@@ -41,17 +43,6 @@ function GameDetails(props) {
               }
             ]
           ), []);
-          const rvis = (
-            <XYPlot height={300} width={300}>
-              <VerticalGridLines />
-              <HorizontalGridLines />
-              <XAxis title="Time" />
-              <YAxis title="Score" tickValues={[4,8,12,16,20,24,28,32]}  />
-              <LineSeries style={{ fill: 'none' }}
-                data={scoreOverTime}
-              />
-            </XYPlot>
-          );
 
           const vChart = (
             <VictoryChart
@@ -145,9 +136,10 @@ function GameDetails(props) {
                   ${stampToString(gameEndTime - game.value.startTime)} 
                   with ${game.value.shots.length} shots (${(pointsPerShot * 100).toFixed(1)}% hit rate)`}
               </p>
-              <div style={{ display: 'flex' }}>
+              <div className={styles.chartContainer}>
                 {vChart}
                 {pieChart}
+                <AverageRateChart game={game.value} />
               </div>
               <p>Longest streak: {streak.t}</p>
               <p>Seconds per shot: {secPerShot.toFixed(2)}</p>
