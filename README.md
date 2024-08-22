@@ -1,4 +1,4 @@
-A project to keep track of a live game of [https://en.wikipedia.org/wiki/Novuss](Novuss) in real time.
+A project to keep track of a live game of [Novuss](https://en.wikipedia.org/wiki/Novuss) in real time.
 
 ## Available Scripts
 
