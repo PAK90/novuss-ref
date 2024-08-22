@@ -1,4 +1,4 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A project to keep track of a live game of [https://en.wikipedia.org/wiki/Novuss](Novuss) in real time.
 
 ## Available Scripts
 
